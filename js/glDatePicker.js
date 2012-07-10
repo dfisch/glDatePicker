@@ -57,13 +57,39 @@
 		showPrevNext: true,
 		allowOld: true,
 		showAlways: false,
-		position: "absolute"
+		position: "absolute",
+    calendarClass: "",
+		timePicker: false,
+		show24Hour: false,
+		buttonText: "Done"
 	};
 
 	var methods =
 	{
 		init: function(options)
 		{
+			
+			var thisDocument = $(document);
+      var documentEvents = thisDocument.data('events');
+      var bindClickEvent = true;
+
+      if(documentEvents && documentEvents.click) {
+        for(var i = 0; i < documentEvents.click.length; i++) {
+          if(documentEvents.click[i].data.name == 'gldp') {
+            bindClickEvent = false;
+            break;
+          }
+        }
+      }
+
+      if(bindClickEvent) {
+        // Bind click elsewhere to hide
+        thisDocument.bind("click", {name:'gldp'}, function(e)
+        {
+          methods.hide.apply($("._gldp"));
+        });
+      }
+
 			return this.each(function()
 			{
 				var self = $(this);
@@ -84,12 +110,6 @@
 				{
 					setTimeout(function() { self.trigger("focus"); }, 50);
 				}
-
-				// Bind click elsewhere to hide
-				$(document).bind("click", function(e)
-				{
-					methods.hide.apply(self);
-				});
 			});
 		},
 
@@ -105,13 +125,13 @@
 		},
 
 		// Hide the calendar
-		hide: function()
+		hide: function(doneClicked)
 		{
 			if($(this).length)
 			{
 				var s = $(this).data("settings");
 
-				// Hide if not showing always
+				// Hide if not showing always and if the time picker is not enabled
 				if(!s.showAlways)
 				{
 					// Hide the calendar and remove class from target
@@ -136,7 +156,15 @@
 		// Set a new selected date
 		setSelectedDate: function(e)
 		{
-			$(this).data("settings").selectedDate = e;
+			var target = $(this);
+      var settings = target.data("settings");
+      target.data("theDate", e);
+      settings.selectedDate = e;
+      // Run callback to user-defined date change method
+      if(settings.onChange != null && typeof settings.onChange != "undefined")
+      {
+        settings.onChange(target, e);
+      }
 		},
 
 		// Render the calendar
@@ -155,8 +183,6 @@
 				startDate = new Date();
 				startDate.setDate(1);
 			}
-			startDate.setHours(0,0,0,0);
-			var startTime = startDate.getTime();
 
 			// Get the end date
 			var endDate = new Date(0);
@@ -169,8 +195,6 @@
 					endDate.setDate(endDate.getDate()+settings.endDate);
 				}
 			}
-			endDate.setHours(0,0,0,0);
-			var endTime = endDate.getTime();
 
 			// Get the selected date
 			var selectedDate = new Date(0);
@@ -183,12 +207,20 @@
 					selectedDate.setDate(selectedDate.getDate()+settings.selectedDate);
 				}
 			}
-			selectedDate.setHours(0,0,0,0);
-			var selectedTime = selectedDate.getTime();
 
 			// Get the current date to render
 			var theDate = target.data("theDate");
-				theDate = (theDate == -1 || typeof theDate == "undefined") ? startDate : theDate;
+			//	theDate = (theDate == -1 || typeof theDate == "undefined") ? startDate : theDate;
+			theDate = (theDate == -1 || typeof theDate == "undefined") ? ((settings.selectedDate != -1 && typeof settings.selectedDate != "undefined") ? selectedDate : startDate) : theDate;
+			
+			// Save current date
+			// because of the timePicker, need to create a new Date() using the current theDate because of zeroing out the time
+			theDate = new Date(theDate);
+			target.data("theDate", theDate);
+
+			var startTime = startDate.setHours(0,0,0,0);
+			var endTime = endDate.setHours(0,0,0,0);
+			var selectedTime = selectedDate.setHours(0,0,0,0);
 
 			// Calculate the first and last date in month being rendered.
 			// Also calculate the weekday to start rendering on
@@ -205,9 +237,6 @@
 
 			// The month names to show in toolbar
 			var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-			// Save current date
-			target.data("theDate", theDate);
 
 			// Render the cells as <TD>
 			var days = "";
@@ -282,8 +311,28 @@
 						"</tr>"+
 						"<tr class='**-dow'>"+ /* Day of Week */
 							"<td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td>"+
-						"</tr>"+days+
-					"</table>"+
+						"</tr>"+days;
+
+			// Add in the time picker html
+			if (settings.timePicker) {
+				var leadZero = function(v) {
+		      return v < 10 ? '0'+v : v;
+		    };
+
+				html += "<tr class='time'><td colspan='7' class='**-time'>"+
+					'<input type="text" class="hour" maxlength="2" value="'+leadZero(settings.show24Hour ? theDate.getHours() : (theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours()))+'" />'+
+					'<div class="separator">:</div><input type="text" class="minutes" maxlength="2" value="'+leadZero(theDate.getMinutes())+'">';
+
+					// Only show the ampm input if not showing a 24 hour clock
+					if (!settings.show24Hour) {
+						html += '<input type="text" class="ampm" maxlength="2" value="'+(theDate.getHours() >= 12 ? 'PM' : 'AM')+'">'
+					}
+					
+					html += "</td></tr>"+
+					"<tr class='time'><td colspan='7'><input type='button' value='" + settings.buttonText + "' class='**-done' /></td></tr>"
+			}
+
+			html += "</table>"+
 				"</div>";
 
 			// Replace css, month-year title
@@ -294,7 +343,7 @@
 			{
 				target.after
 				(
-					$("<div id='"+calId+"'></div>")
+					 $("<div id='"+calId+"' class='" + settings.calendarClass + "'></div>")
 					.css(
 					{
 						"position":settings.position,
@@ -311,6 +360,59 @@
 
 			// Add a class to make it easier to find when hiding
 			target.addClass("_gldp");
+
+			// if the timePicker is enabled, add the click event on the button
+			if (settings.timePicker) {
+				$("tr.time").click(function(e) { e.stopPropagation(); })
+
+				$("[class*=-done]", calendar).click(function(e) {
+					e.stopPropagation();
+
+					var settings = target.data("settings");
+					var time = $(this).closest("tr").siblings("tr.time").children("td.gldp-"+settings.cssName + "-time");
+
+					var newDate = target.data("newDate");
+					target.removeData("newDate");
+					if (!newDate) {
+						newDate = new Date(target.data("theDate"));
+					}
+
+					var hour = parseInt(time.children("input.hour").val(), 10);
+					var minutes = parseInt(time.children("input.minutes").val(), 10);
+
+					if (!settings.show24Hour) {
+						var ampm = time.children("input.ampm").val().toUpperCase();
+						if (ampm == "PM" && hour != 12) {
+							hour += 12;
+						} else if (ampm == "AM" && hour == 12) {
+							hour = 0;
+						}
+					}
+
+					newDate.setHours(hour, minutes, 0, 0);
+
+					// Save selected
+					target.data("theDate", newDate);
+					settings.selectedDate = newDate;
+
+					var val = (newDate.getMonth()+1)+"/"+newDate.getDate()+"/"+newDate.getFullYear();
+					if (settings.show24Hour) {
+						val = val + " " + leadZero(newDate.getHours()) + ":" + leadZero(newDate.getMinutes());
+					} else {
+						val = val + " " + leadZero((newDate.getHours() > 12 ? newDate.getHours() - 12 : newDate.getHours() == 0 ? 12 : newDate.getHours())) + ":" + leadZero(newDate.getMinutes()) + " " + (newDate.getHours() > 11 ? "PM" : "AM");
+					}
+					target.val(val);
+
+					// Run callback to user-defined date change method
+					if(settings.onChange != null && typeof settings.onChange != "undefined")
+					{
+						settings.onChange(target, newDate);
+					}
+
+					// Hide calendar
+					methods.hide.apply(target);
+				});
+			}
 
 			// Handle previous/next clicks
 			$("[class*=-prevnext]", calendar).click(function(e)
@@ -353,20 +455,34 @@
 					var newDate = new Date(theDate); newDate.setDate(day);
 
 					// Save the new date and update the target control
-					target.data("theDate", newDate);
-					target.val((newDate.getMonth()+1)+"/"+newDate.getDate()+"/"+newDate.getFullYear());
+					target.data("newDate", newDate);
 
-					// Run callback to user-defined date change method
-					if(settings.onChange != null && typeof settings.onChange != "undefined")
-					{
-						settings.onChange(target, newDate);
+					// set the value and call the change events only if the timePicker is not enabled
+					if (!settings.timePicker) {
+						target.data("theDate", newDate);
+						target.val((newDate.getMonth()+1)+"/"+newDate.getDate()+"/"+newDate.getFullYear());
+
+						// Run callback to user-defined date change method
+						if(settings.onChange != null && typeof settings.onChange != "undefined")
+						{
+							settings.onChange(target, newDate);
+						}
+
+						// Save selected
+						settings.selectedDate = newDate;
+
+						// Hide calendar
+						methods.hide.apply(target);
+					} else {
+						var prefix = "gldp-"+settings.cssName+"-"
+						var css = prefix+$(this).children("div").attr("class");
+						$(this).removeClass(css+"-hover").addClass(css);
+
+						calendar.find("div.selected").removeClass("selected").addClass("day").end()
+							.find("td." + prefix + "selected").removeClass(prefix + "selected");
+
+						$(this).addClass(prefix + "selected").children("div").attr("class", "selected");
 					}
-
-					// Save selected
-					settings.selectedDate = newDate;
-
-					// Hide calendar
-					methods.hide.apply(target);
 				});
 		}
 	};

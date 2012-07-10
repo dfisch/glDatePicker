@@ -161,7 +161,37 @@
 							);
 						}
 					});</pre>
+				<br/><br/>
 				<!-- END Example #6 -->
+
+				<!-- BEGIN Example #7 -->
+				<p>
+					<b><span class="example">Example #7</span>: Using a time picker</b>
+				</p>
+				<input type="text" id="date7" class="gldp" />
+				<br/><br/>
+				<pre class="brush:js">
+					$("#date7").glDatePicker(
+					{
+						timePicker: true,
+						buttonText: "Select"
+					});</pre>
+				<br/><br/>
+				<!-- END Example #7 -->
+
+				<!-- BEGIN Example #8 -->
+				<p>
+					<b><span class="example">Example #8</span>: Using a time picker with 24 hour clock (with defult button text)</b>
+				</p>
+				<input type="text" id="date8" class="gldp" />
+				<br/><br/>
+				<pre class="brush:js">
+					$("#date8").glDatePicker(
+					{
+						timePicker: true,
+						show24Hour: true
+					});</pre>
+				<!-- END Example #8 -->
 			</div>
 			<!-- END examples -->
 
@@ -358,6 +388,18 @@
 						newDate.getDate()
 					);
 				}
+			});
+
+			$("#date7").glDatePicker(
+			{
+				timePicker: true,
+				buttonText: "Select"
+			});
+
+			$("#date8").glDatePicker(
+			{
+				timePicker: true,
+				show24Hour: true
 			});
 		});
 	</script>

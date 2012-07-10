@@ -130,3 +130,8 @@
 	color:#666;
 	cursor:wait;
 }
+
+.gldp-default .gldp-default-time div, .gldp-default .gldp-default-time input {display:inline-block; font-size:1.5em;}
+.gldp-default .gldp-default-time input {width:15%;}
+.gldp-default .gldp-default-time input.hour {text-align:right;}
+.gldp-default .gldp-default-time input.ampm {width:15%;}

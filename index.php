@@ -320,7 +320,41 @@
 						//         );
 						//     }
 						// });
-						onChange: null
+						onChange: null,
+
+						// Adds additional class(s) to the calendar itself
+						calendarClass: "",
+
+						// Turns on the time picker at the bottom of the calendar
+						// If jquery.mousewheel.js is included in the page
+						// the hour / minute / am-pm can be scrolled
+						// see https://github.com/brandonaaron/jquery-mousewheel
+						// The time picker and some of its functionallity was 
+						// inspired by https://github.com/zenapsis/will_pickdate
+						timePicker: false,
+
+						// If the time picker is turned on, should the time be in miltary time (24 clock)
+						// if this is turned on, the AM / PM field will not be displayed
+						show24Hour: false,
+
+						// If the time picker is enabled, this is the value of the button to 
+						// trigger that the user is "done" selecting the date / time
+						buttonText: "Done",
+
+						// The following properties will only be applied if datejs is 
+						// included in the page
+						// see http://www.datejs.com/
+
+						// Specify a format for the date / time
+						// see http://code.google.com/p/datejs/wiki/FormatSpecifiers for a list of formats
+						format: false,
+
+						// Enable text to be entered into the target text field and parsed as a 
+						// date using the datejs library
+						// Allows things like, "today", "tomorrow", "next friday", etc... 
+						// to be used to update the calendar.
+						// try it out http://www.datejs.com/
+						enableText: false
 					});
 
 

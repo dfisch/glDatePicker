@@ -333,6 +333,7 @@
 	<script src="site/js/shBrushJScript.js" type="text/javascript"></script>
 	<script src="site/js/shBrushBash.js" type="text/javascript"></script>
 
+	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="js/glDatePicker.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function()

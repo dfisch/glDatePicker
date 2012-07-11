@@ -314,11 +314,11 @@
 						"</tr>"+days;
 
 			// Add in the time picker html
-			if (settings.timePicker) {
-				var leadZero = function(v) {
-		      return v < 10 ? '0'+v : v;
-		    };
+			var leadZero = function(v) {
+	      return v < 10 ? '0'+v : v;
+	    };
 
+			if (settings.timePicker) {
 				html += "<tr class='time'><td colspan='7' class='**-time'>"+
 					'<input type="text" class="hour" maxlength="2" value="'+leadZero(settings.show24Hour ? theDate.getHours() : (theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours()))+'" />'+
 					'<div class="separator">:</div><input type="text" class="minutes" maxlength="2" value="'+leadZero(theDate.getMinutes())+'">';
@@ -363,7 +363,85 @@
 
 			// if the timePicker is enabled, add the click event on the button
 			if (settings.timePicker) {
-				$("tr.time").click(function(e) { e.stopPropagation(); })
+				$("tr.time", calendar).click(function(e) { e.stopPropagation(); });
+
+				if ($.fn.mousewheel) {
+					// setup the mousewheel on the hour field
+					$("input.hour", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
+		        e.preventDefault();
+		        e.stopPropagation();
+
+		        var i = $(e.target);
+		        v = parseInt(i.val(), 10);
+		        i.focus();
+
+		        if(settings.show24Hour) {
+		          if(dy > 0) {
+		            v = (v < 23) ? v + 1 : 0;
+		          }
+		          else if(dy < 0) {
+		            v = (v > 0) ? v - 1 : 23;
+		          }
+		        }
+		        else {
+		          var ampm = $("input.ampm", calendar);
+		          if(dy > 0) {
+		            if(v == 11) {
+		              v = 12;
+		              ampm.val(ampm.val() == 'AM' ? 'PM' : 'AM');
+		            }
+		            else if(v < 12) {
+		              v++;
+		            }
+		            else {
+		              v = 1;
+		            }
+		          }
+		          else if (dy < 0) {
+		            if(v == 12) {
+		              v = 11;
+		              ampm.val(ampm.val() == 'AM' ? 'PM' : 'AM');
+		            }
+		            else if(v > 1) {
+		              v--;
+		            }
+		            else {
+		              v = 12;
+		            }
+		          }
+		        }
+
+		        i.val(leadZero(v));
+		      }));
+
+					$("input.minutes", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
+		        e.preventDefault();
+		        e.stopPropagation();
+
+		        var i = $(e.target), v = parseInt(i.val(), 10);
+		        i.focus();
+		        if(dy > 0) {
+		          v = (v < 59) ? v + 1 : 0;
+		        }
+		        else if(dy < 0) {
+		          v = (v > 0) ? v - 1 : 59;
+		        }
+
+		        i.val(leadZero(v));
+		      }, this));
+
+		      $("input.ampm", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
+	          e.preventDefault();
+	          e.stopPropagation();
+
+	          var i = $(e.target);
+	          i.focus();
+
+	          if(dy > 0 || dy < 0) {
+	            i.val(i.val() == "AM" ? "PM" : "AM");
+	          }
+	        }));
+				}
 
 				$("[class*=-done]", calendar).click(function(e) {
 					e.stopPropagation();

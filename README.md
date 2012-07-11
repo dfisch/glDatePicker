@@ -45,6 +45,50 @@ Finally bind the plugin to the input textbox and set any options you want:
         }
     });
 
+Time Picker
+-----------
+
+To enable the time picker, set the timePicker property to true.
+
+    $("#date").glDatePicker(
+    {
+        timePicker: true,
+        allowOld: false,
+        startDate: new Date("September 5, 2011"),
+        endDate: new Date("October 26, 2011"),
+        onChange: function(target, newDate)
+        {
+            alert("You selected: " + newDate);
+        }
+    });
+
+Optional Libraries
+------------------
+
+Mousewheel
+----------
+    <script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+
+If using the time picker, this will allow the hour / minute / ampm input fields to scroll using the mouse wheel.
+
+Datejs
+------
+    <script type="text/javascript" src="js/datejs.js"></script>
+
+If you want to enable the format property, you must include this file.
+
+    $("#date").glDatePicker(
+    {
+        format: "M-d-yyyy"
+    });
+
+If you want to be able to enter text like "tomorrow", "today", "next friday", etc... into the text field that triggers the calendar, you must include this file.
+    
+    $("#date").glDatePicker(
+    {
+        enableText: true
+    });
+
 
 License
 -------

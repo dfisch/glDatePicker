@@ -61,7 +61,9 @@
     calendarClass: "",
 		timePicker: false,
 		show24Hour: false,
-		buttonText: "Done"
+		buttonText: "Done",
+		format: false,	// only available if datejs is included, will default to current if not
+		enableText: false	// only available if datejs is included, will allow for thing like "tomorrow", "next week", "next month" to be entered into the text field to update the calendar
 	};
 
 	var methods =
@@ -104,15 +106,43 @@
 				self
 					.click(methods.show)
 					.focus(methods.show);
-					
-				if (!settings.timePicker) {
-					self.focusout(methods.hide);
-				}
 
 				// If always showing, trigger click causing it to show
 				if(settings.showAlways)
 				{
 					setTimeout(function() { self.trigger("focus"); }, 50);
+				}
+
+				if (Date.today) {
+					settings.dateJsAvailable = true;
+					// enable the ability to type a date as an expression to the input
+					// ex.  tomorrow, next month, next year, next friday
+					// see www.datejs.com
+					if (settings.enableText) {
+						self.bind("keyup change", function(e) {
+							if(e.keyCode == 13){
+					      methods.setValue.apply(self);
+					      return false;
+					    }
+
+							var val = $(this).val();
+							if (val == "") {
+								methods.setSelectedDate.apply(self, []);
+								methods.update.apply(self);
+							} else {
+								try {
+									// attempt to parse the date
+									var newDate = Date.parse(val);
+									if (newDate) {
+										methods.setSelectedDate.apply(self, [newDate]);
+										methods.update.apply(self);
+									}
+								} catch (err) {}
+							}
+						});
+					}
+				} else {
+					settings.dateJsAvailable = false;
 				}
 			});
 		},
@@ -129,19 +159,44 @@
 		},
 
 		// Hide the calendar
-		hide: function(doneClicked)
+		hide: function()
 		{
-			if($(this).length)
+			var target = $(this);
+			if(target.length)
 			{
-				var s = $(this).data("settings");
+				var s = target.data("settings");
 
 				// Hide if not showing always and if the time picker is not enabled
 				if(!s.showAlways)
 				{
 					// Hide the calendar and remove class from target
 					$("#"+s.calId).slideUp(200);
-					$(this).removeClass("_gldp");
+					target.removeClass("_gldp");
 				}
+
+				methods.setValue.apply(target);
+			}
+		},
+
+		// Set the value of the target, formatting the current date
+		setValue: function() {
+			var target = $(this);
+			var settings = target.data("settings");
+			var theDate = target.data("theDate");
+			if (settings.dateJsAvailable && settings.format) {
+				target.val(theDate.toString(settings.format));
+			} else {
+				var val = (theDate.getMonth()+1)+"/"+theDate.getDate()+"/"+theDate.getFullYear();
+				
+				if (settings.timePeriod) {
+					if (settings.show24Hour) {
+						val = val + " " + helpers.leadZero(theDate.getHours()) + ":" + helpers.leadZero(theDate.getMinutes());
+					} else {
+						val = val + " " + helpers.leadZero((theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours())) + ":" + helpers.leadZero(theDate.getMinutes()) + " " + (theDate.getHours() > 11 ? "PM" : "AM");
+					}
+				}
+
+				target.val(val);
 			}
 		},
 
@@ -160,6 +215,7 @@
 		// Set a new selected date
 		setSelectedDate: function(e)
 		{
+			// $(this).data("settings").selectedDate = e;
 			var target = $(this);
       var settings = target.data("settings");
       target.data("theDate", e);
@@ -318,14 +374,10 @@
 						"</tr>"+days;
 
 			// Add in the time picker html
-			var leadZero = function(v) {
-	      return v < 10 ? '0'+v : v;
-	    };
-
 			if (settings.timePicker) {
 				html += "<tr class='time'><td colspan='7' class='**-time'>"+
-					'<input type="text" class="hour" maxlength="2" value="'+leadZero(settings.show24Hour ? theDate.getHours() : (theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours()))+'" />'+
-					'<div class="separator">:</div><input type="text" class="minutes" maxlength="2" value="'+leadZero(theDate.getMinutes())+'">';
+					'<input type="text" class="hour" maxlength="2" value="'+helpers.leadZero(settings.show24Hour ? theDate.getHours() : (theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours()))+'" />'+
+					'<div class="separator">:</div><input type="text" class="minutes" maxlength="2" value="'+helpers.leadZero(theDate.getMinutes())+'">';
 
 					// Only show the ampm input if not showing a 24 hour clock
 					if (!settings.show24Hour) {
@@ -415,7 +467,7 @@
 		          }
 		        }
 
-		        i.val(leadZero(v));
+		        i.val(helpers.leadZero(v));
 		      }));
 
 					$("input.minutes", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
@@ -431,7 +483,7 @@
 		          v = (v > 0) ? v - 1 : 59;
 		        }
 
-		        i.val(leadZero(v));
+		        i.val(helpers.leadZero(v));
 		      }, this));
 
 		      $("input.ampm", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
@@ -477,13 +529,7 @@
 					target.data("theDate", newDate);
 					settings.selectedDate = newDate;
 
-					var val = (newDate.getMonth()+1)+"/"+newDate.getDate()+"/"+newDate.getFullYear();
-					if (settings.show24Hour) {
-						val = val + " " + leadZero(newDate.getHours()) + ":" + leadZero(newDate.getMinutes());
-					} else {
-						val = val + " " + leadZero((newDate.getHours() > 12 ? newDate.getHours() - 12 : newDate.getHours() == 0 ? 12 : newDate.getHours())) + ":" + leadZero(newDate.getMinutes()) + " " + (newDate.getHours() > 11 ? "PM" : "AM");
-					}
-					target.val(val);
+					methods.setValue.apply(target);
 
 					// Run callback to user-defined date change method
 					if(settings.onChange != null && typeof settings.onChange != "undefined")
@@ -514,6 +560,16 @@
 				}
 			});
 
+			// if text is enabled, there needs to be some way to click on the selected day
+			// because the text will update the date in the calendar
+			if (settings.enableText) {
+				$("tr.days td.selected", calendar).click(function(e) {
+					e.stopPropagation();
+					methods.setValue.apply(target);
+					methods.hide.apply(target);
+				});
+			}
+
 			// Highlight day cell on hover
 			$("tr.days td:not(.noday, .selected)", calendar)
 				.mouseenter(function(e)
@@ -542,7 +598,8 @@
 					// set the value and call the change events only if the timePicker is not enabled
 					if (!settings.timePicker) {
 						target.data("theDate", newDate);
-						target.val((newDate.getMonth()+1)+"/"+newDate.getDate()+"/"+newDate.getFullYear());
+
+						methods.setValue.apply(target);
 
 						// Run callback to user-defined date change method
 						if(settings.onChange != null && typeof settings.onChange != "undefined")
@@ -567,6 +624,13 @@
 					}
 				});
 		}
+	};
+
+	var helpers = 
+	{
+		leadZero: function(v) {
+      return v < 10 ? '0'+v : v;
+    }
 	};
 
 	// Plugin entry

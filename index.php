@@ -166,22 +166,21 @@
 
 				<!-- BEGIN Example #7 -->
 				<p>
-					<b><span class="example">Example #7</span>: Using a time picker</b>
+					<b><span class="example">Example #7</span>: Using format (must include datejs) to show date in a different format</b>
 				</p>
 				<input type="text" id="date7" class="gldp" />
 				<br/><br/>
 				<pre class="brush:js">
 					$("#date7").glDatePicker(
 					{
-						timePicker: true,
-						buttonText: "Select"
+						format: "M-d-yyyy"
 					});</pre>
 				<br/><br/>
 				<!-- END Example #7 -->
 
 				<!-- BEGIN Example #8 -->
 				<p>
-					<b><span class="example">Example #8</span>: Using a time picker with 24 hour clock (with defult button text)</b>
+					<b><span class="example">Example #8</span>: Using a time picker</b>
 				</p>
 				<input type="text" id="date8" class="gldp" />
 				<br/><br/>
@@ -189,9 +188,53 @@
 					$("#date8").glDatePicker(
 					{
 						timePicker: true,
+						buttonText: "Select"
+					});</pre>
+				<br/><br/>
+				<!-- END Example #8 -->
+
+				<!-- BEGIN Example #9 -->
+				<p>
+					<b><span class="example">Example #9</span>: Using a time picker with 24 hour clock (with defult button text)</b>
+				</p>
+				<input type="text" id="date9" class="gldp" />
+				<br/><br/>
+				<pre class="brush:js">
+					$("#date9").glDatePicker(
+					{
+						timePicker: true,
 						show24Hour: true
 					});</pre>
-				<!-- END Example #8 -->
+					<br/><br/>
+				<!-- END Example #9 -->
+				<!-- BEGIN Example #10 -->
+				<p>
+					<b><span class="example">Example #10</span>: Using a time picker with a custom format (must include datejs)</b>
+				</p>
+				<input type="text" id="date10" class="gldp" />
+				<br/><br/>
+				<pre class="brush:js">
+					$("#date10").glDatePicker(
+					{
+						timePicker: true,
+						buttonText: "Select",
+						format: "dddd, MMMM dd, yyyy h:mm:ss tt"
+					});</pre>
+				<br/><br/>
+				<!-- END Example #10 -->
+				<!-- BEGIN Example #11 -->
+				<p>
+					<b><span class="example">Example #11</span>: Default with text enabled (must include datejs)</b>
+				</p>
+				<input type="text" id="date11" class="gldp" />
+				<br/><br/>
+				<pre class="brush:js">
+					$("#date11").glDatePicker(
+					{
+						enableText: true
+					});</pre>
+				<br/><br/>
+				<!-- END Example #11 -->
 			</div>
 			<!-- END examples -->
 
@@ -334,6 +377,7 @@
 	<script src="site/js/shBrushBash.js" type="text/javascript"></script>
 
 	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+	<script type="text/javascript" src="js/datejs.js"></script>
 	<script type="text/javascript" src="js/glDatePicker.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function()
@@ -393,14 +437,31 @@
 
 			$("#date7").glDatePicker(
 			{
-				timePicker: true,
-				buttonText: "Select"
+				format: "M-d-yyyy"
 			});
 
 			$("#date8").glDatePicker(
 			{
 				timePicker: true,
+				buttonText: "Select"
+			});
+
+			$("#date9").glDatePicker(
+			{
+				timePicker: true,
 				show24Hour: true
+			});
+
+			$("#date10").glDatePicker(
+			{
+				timePicker: true,
+				buttonText: "Select",
+				format: "dddd, MMMM dd, yyyy h:mm:ss tt"
+			});
+
+			$("#date11").glDatePicker(
+			{
+				enableText: true
 			});
 		});
 	</script>

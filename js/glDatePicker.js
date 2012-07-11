@@ -103,8 +103,11 @@
 				// Bind click and focus event to show
 				self
 					.click(methods.show)
-					.focus(methods.show)
-					.focusout(methods.hide);
+					.focus(methods.show);
+					
+				if (!settings.timePicker) {
+					self.focusout(methods.hide);
+				}
 
 				// If always showing, trigger click causing it to show
 				if(settings.showAlways)

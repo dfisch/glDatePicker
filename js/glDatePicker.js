@@ -121,13 +121,14 @@
 					if (settings.enableText) {
 						self.bind("keyup change", function(e) {
 							if(e.keyCode == 13){
+								e.stopPropagation();
 					      methods.setValue.apply(self);
 					      return false;
 					    }
 
 							var val = $(this).val();
-							if (val == "") {
-								methods.setSelectedDate.apply(self, []);
+							if (!val || val == '') {
+								methods.setSelectedDate.apply(self, [-1]);
 								methods.update.apply(self);
 							} else {
 								try {
@@ -182,21 +183,25 @@
 		setValue: function() {
 			var target = $(this);
 			var settings = target.data("settings");
-			var theDate = target.data("theDate");
-			if (settings.dateJsAvailable && settings.format) {
-				target.val(theDate.toString(settings.format));
-			} else {
-				var val = (theDate.getMonth()+1)+"/"+theDate.getDate()+"/"+theDate.getFullYear();
-				
-				if (settings.timePeriod) {
-					if (settings.show24Hour) {
-						val = val + " " + helpers.leadZero(theDate.getHours()) + ":" + helpers.leadZero(theDate.getMinutes());
-					} else {
-						val = val + " " + helpers.leadZero((theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours())) + ":" + helpers.leadZero(theDate.getMinutes()) + " " + (theDate.getHours() > 11 ? "PM" : "AM");
+			var theDate = settings.selectedDate//target.data("theDate");
+			if (theDate && theDate != -1) {
+				if (settings.dateJsAvailable && settings.format) {
+					target.val(theDate.toString(settings.format));
+				} else {
+					var val = (theDate.getMonth()+1)+"/"+theDate.getDate()+"/"+theDate.getFullYear();
+					
+					if (settings.timePicker) {
+						if (settings.show24Hour) {
+							val = val + " " + helpers.leadZero(theDate.getHours()) + ":" + helpers.leadZero(theDate.getMinutes());
+						} else {
+							val = val + " " + helpers.leadZero((theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours())) + ":" + helpers.leadZero(theDate.getMinutes()) + " " + (theDate.getHours() > 11 ? "PM" : "AM");
+						}
 					}
-				}
 
-				target.val(val);
+					target.val(val);
+				}
+			} else {
+				target.val('');
 			}
 		},
 
@@ -218,8 +223,10 @@
 			// $(this).data("settings").selectedDate = e;
 			var target = $(this);
       var settings = target.data("settings");
-      target.data("theDate", e);
+
+	    target.data("theDate", e);
       settings.selectedDate = e;
+
       // Run callback to user-defined date change method
       if(settings.onChange != null && typeof settings.onChange != "undefined")
       {

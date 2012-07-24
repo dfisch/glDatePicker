@@ -426,6 +426,31 @@
 
 			// if the timePicker is enabled, add the click event on the button
 			if (settings.timePicker) {
+				var numericKeydown = function(event) {
+					// Allow: backspace, delete, tab, escape, and enter
+		        if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 || 
+		            // Allow: Ctrl+A
+		            (event.keyCode == 65 && event.ctrlKey === true) || 
+		             // Allow: home, end, left, right
+		            (event.keyCode >= 35 && event.keyCode <= 39)) {
+              // let it happen, don't do anything
+              return;
+		        }
+		        else {
+	            // Ensure that it is a number and stop the keypress
+	            if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
+	               event.preventDefault(); 
+	            }   
+		        }
+		      };
+
+		    var numericFocusout = function(event) {
+		    	var thisInput = $(this);
+		    	if (thisInput.val() == '') {
+		    		thisInput.val(helpers.leadZero(0));
+		    	}
+		    };
+
 				$("tr.time", calendar).click(function(e) { e.stopPropagation(); });
 
 				if ($.fn.mousewheel) {
@@ -475,7 +500,7 @@
 		        }
 
 		        i.val(helpers.leadZero(v));
-		      }));
+		      })).keydown(numericKeydown).focusout(numericFocusout);
 
 					$("input.minutes", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
 		        e.preventDefault();
@@ -491,7 +516,7 @@
 		        }
 
 		        i.val(helpers.leadZero(v));
-		      }, this));
+		      }, this)).keydown(numericKeydown).focusout(numericFocusout);
 
 		      $("input.ampm", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
 	          e.preventDefault();
@@ -503,7 +528,9 @@
 	          if(dy > 0 || dy < 0) {
 	            i.val(i.val() == "AM" ? "PM" : "AM");
 	          }
-	        }));
+	        })).keydown(function() {
+		      	return false;
+	        });
 				}
 
 				$("[class*=-done]", calendar).click(function(e) {

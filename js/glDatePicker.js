@@ -548,6 +548,14 @@
 					var hour = parseInt(time.children("input.hour").val(), 10);
 					var minutes = parseInt(time.children("input.minutes").val(), 10);
 
+					if (isNaN(hour)) {
+						hour = 0;
+					}
+
+					if (isNaN(minutes)) {
+						minutes = 0;
+					}
+
 					if (!settings.show24Hour) {
 						var ampm = time.children("input.ampm").val().toUpperCase();
 						if (ampm == "PM" && hour != 12) {

@@ -235,6 +235,24 @@
 					});</pre>
 				<br/><br/>
 				<!-- END Example #11 -->
+
+				<!-- BEGIN Example #12 -->
+				<p>
+					<b><span class="example">Example #12</span> If using text input, check the end date (must include datejs)</b>
+				</p>
+				<input type="text" id="date12" class="gldp" />
+				<br/><br/>
+				<pre class="brush:js">
+					$("#date12").glDatePicker(
+					{
+						enableText: true,
+						timePicker: true,
+						buttonText: "Select",
+						format: "dddd, MMMM dd, yyyy h:mm:ss tt",
+						endDate: new Date()
+					});</pre>
+				<br/><br/>
+				<!-- END Example #12 -->
 			</div>
 			<!-- END examples -->
 
@@ -496,6 +514,15 @@
 			$("#date11").glDatePicker(
 			{
 				enableText: true
+			});
+
+			$("#date12").glDatePicker(
+			{
+				enableText: true,
+				timePicker: true,
+				buttonText: "Select",
+				format: "dddd, MMMM dd, yyyy h:mm:ss tt",
+				endDate: new Date()
 			});
 		});
 	</script>

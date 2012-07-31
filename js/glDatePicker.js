@@ -134,7 +134,7 @@
 								try {
 									// attempt to parse the date
 									var newDate = Date.parse(val);
-									if (newDate) {
+									if (helpers.validDate(newDate, settings.startDate, settings.endDate)) {
 										methods.setSelectedDate.apply(self, [newDate]);
 										methods.update.apply(self);
 									}
@@ -568,15 +568,17 @@
 					newDate.setHours(hour, minutes, 0, 0);
 
 					// Save selected
-					target.data("theDate", newDate);
-					settings.selectedDate = newDate;
+					if (helpers.validDate(newDate, settings.startDate, settings.endDate)) {
+						target.data("theDate", newDate);
+						settings.selectedDate = newDate;
 
-					methods.setValue.apply(target);
+						methods.setValue.apply(target);
 
-					// Run callback to user-defined date change method
-					if(settings.onChange != null && typeof settings.onChange != "undefined")
-					{
-						settings.onChange(target, newDate);
+						// Run callback to user-defined date change method
+						if(settings.onChange != null && typeof settings.onChange != "undefined")
+						{
+							settings.onChange(target, newDate);
+						}
 					}
 
 					// Hide calendar
@@ -672,6 +674,21 @@
 	{
 		leadZero: function(v) {
       return v < 10 ? '0'+v : v;
+    },
+    validDate: function(newDate, startDate, endDate) {
+    	if (!newDate) {
+    		return false;
+    	}
+
+			if (startDate != -1 && (newDate < startDate)) {
+				return false;
+			}
+
+			if (endDate != -1 && (newDate > endDate)) {
+				return false;
+			}
+
+			return true;
     }
 	};
 

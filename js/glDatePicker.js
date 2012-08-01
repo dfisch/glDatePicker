@@ -342,7 +342,7 @@
 						// Test against selected date
 						if(settings.selectedDate != -1)
 						{
-							c = (dateTime == selectedTime) ? "selected":c;
+							c = (dateTime == selectedTime) ? ("selected " + c):c;
 						}
 					}
 					else
@@ -615,11 +615,14 @@
 			}
 
 			// Highlight day cell on hover
-			$("tr.days td:not(.noday, .selected)", calendar)
+			$("tr.days td:not(.noday)", calendar)
 				.mouseenter(function(e)
 				{
-					var css = "gldp-"+settings.cssName+"-"+$(this).children("div").attr("class");
-					$(this).removeClass(css).addClass(css+"-hover");
+					if (!$(this).hasClass("selected"))
+					{
+						var css = "gldp-"+settings.cssName+"-"+$(this).children("div").attr("class");
+						$(this).removeClass(css).addClass(css+"-hover");
+					}
 				})
 				.mouseleave(function(e)
 				{
@@ -657,14 +660,25 @@
 						// Hide calendar
 						methods.hide.apply(target);
 					} else {
-						var prefix = "gldp-"+settings.cssName+"-"
-						var css = prefix+$(this).children("div").attr("class");
-						$(this).removeClass(css+"-hover").addClass(css);
+						var prefix = "gldp-"+settings.cssName+"-";
 
-						calendar.find("div.selected").removeClass("selected").addClass("day").end()
-							.find("td." + prefix + "selected").removeClass(prefix + "selected");
+						var newSelected = $(this);
+						var oldSelected = calendar.find("td.selected");
 
-						$(this).addClass(prefix + "selected").children("div").attr("class", "selected");
+						// remove the selected class from the old selected td and its child div
+						oldSelected.removeClass("selected").children().removeClass("selected");
+						// remove the prefix + selected from the td
+						oldSelected.removeClass(prefix + "selected");
+						// create the css class that needs to be added to the td
+						var oldSelectedCss = prefix+oldSelected.children("div").attr("class");
+						oldSelected.addClass(oldSelectedCss);
+
+						// determine the new selected tds class
+						var newSelectedCss = prefix+newSelected.children("div").attr("class");
+						// remove the hover class (there because we have clicked it) and remove the default type class
+						newSelected.removeClass(newSelectedCss + "-hover").removeClass(newSelectedCss);
+						// add the selected class to the td and the div and add the prefix + selected to the td
+						newSelected.addClass("selected").addClass(prefix + "selected").children().addClass("selected");
 					}
 				});
 		}

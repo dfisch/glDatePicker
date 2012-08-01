@@ -249,10 +249,28 @@
 						timePicker: true,
 						buttonText: "Select",
 						format: "dddd, MMMM dd, yyyy h:mm:ss tt",
-						endDate: new Date()
+						endDate: new Date(),
+						selectedDate: Date.parse("last thursday")
 					});</pre>
 				<br/><br/>
 				<!-- END Example #12 -->
+
+				<!-- BEGIN Example #13 -->
+				<!--
+				<p>
+					<b><span class="example">Example #13</span> Show Always</b>
+				</p>
+				<input type="text" id="date13" class="gldp" />
+				<br/><br/>
+				<pre class="brush:js">
+					$("#date13").glDatePicker(
+					{
+						enableText: true,
+						showAlways: true
+					});</pre>
+				<br/><br/>
+			-->
+				<!-- END Example #13 -->
 			</div>
 			<!-- END examples -->
 
@@ -522,8 +540,15 @@
 				timePicker: true,
 				buttonText: "Select",
 				format: "dddd, MMMM dd, yyyy h:mm:ss tt",
-				endDate: new Date()
+				endDate: new Date(),
+				selectedDate: Date.parse("last thursday")
 			});
+
+			// $("#date13").glDatePicker(
+			// {
+			// 	enableText: true,
+			// 	showAlways: true
+			// });
 		});
 	</script>
 

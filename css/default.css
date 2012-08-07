@@ -132,6 +132,8 @@
 }
 
 .gldp-default .gldp-default-time div, .gldp-default .gldp-default-time input {display:inline-block; font-size:1.5em;}
-.gldp-default .gldp-default-time input {width:15%;}
+.gldp-default .gldp-default-time input.gldp-default-timeentry {width:15%;}
 .gldp-default .gldp-default-time input.hour {text-align:right;}
-.gldp-default .gldp-default-time input.ampm {width:15%;}
+/*.gldp-default .gldp-default-time input.ampm {width:15%;}*/
+.gldp-default .gldp-default-btnampm { border: solid 1px #fff;}
+.gldp-default .gldp-default-btnampm.selected { border: solid 1px #f82200; background-color: #fff;}

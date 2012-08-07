@@ -383,12 +383,12 @@
 			// Add in the time picker html
 			if (settings.timePicker) {
 				html += "<tr class='time'><td colspan='7' class='**-time'>"+
-					'<input type="text" class="hour" maxlength="2" value="'+helpers.leadZero(settings.show24Hour ? theDate.getHours() : (theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours()))+'" />'+
-					'<div class="separator">:</div><input type="text" class="minutes" maxlength="2" value="'+helpers.leadZero(theDate.getMinutes())+'">';
+					'<input type="text" class="**-timeentry hour" maxlength="2" value="'+helpers.leadZero(settings.show24Hour ? theDate.getHours() : (theDate.getHours() > 12 ? theDate.getHours() - 12 : theDate.getHours() == 0 ? 12 : theDate.getHours()))+'" />'+
+					'<div class="separator">:</div><input type="text" class="**-timeentry minutes" maxlength="2" value="'+helpers.leadZero(theDate.getMinutes())+'">';
 
 					// Only show the ampm input if not showing a 24 hour clock
 					if (!settings.show24Hour) {
-						html += '<input type="text" class="ampm" maxlength="2" value="'+(theDate.getHours() >= 12 ? 'PM' : 'AM')+'">'
+						html += '<input type="button" class="**-btnampm ampm' + (theDate.getHours() >= 12 ? '' : ' selected') + '" value="AM" /><input type="button" class="**-btnampm ampm' + (theDate.getHours() >= 12 ? ' selected' : '') + '" value="PM" />'
 					}
 					
 					html += "</td></tr>"+
@@ -472,11 +472,12 @@
 		          }
 		        }
 		        else {
-		          var ampm = $("input.ampm", calendar);
+		          var ampm = $("input.gldp-"+ settings.cssName + "-btnampm", calendar);
 		          if(dy > 0) {
 		            if(v == 11) {
 		              v = 12;
-		              ampm.val(ampm.val() == 'AM' ? 'PM' : 'AM');
+		              //ampm.val(ampm.val() == 'AM' ? 'PM' : 'AM');
+		              ampm.toggleClass("selected");
 		            }
 		            else if(v < 12) {
 		              v++;
@@ -488,7 +489,8 @@
 		          else if (dy < 0) {
 		            if(v == 12) {
 		              v = 11;
-		              ampm.val(ampm.val() == 'AM' ? 'PM' : 'AM');
+		              // ampm.val(ampm.val() == 'AM' ? 'PM' : 'AM');
+		              ampm.toggleClass("selected");
 		            }
 		            else if(v > 1) {
 		              v--;
@@ -518,17 +520,8 @@
 		        i.val(helpers.leadZero(v));
 		      }, this)).keydown(numericKeydown).focusout(numericFocusout);
 
-		      $("input.ampm", calendar).mousewheel($.proxy(function(e, d, dx, dy) {
-	          e.preventDefault();
-	          e.stopPropagation();
-
-	          var i = $(e.target);
-	          i.focus();
-
-	          if(dy > 0 || dy < 0) {
-	            i.val(i.val() == "AM" ? "PM" : "AM");
-	          }
-	        })).keydown(function() {
+		      $("input.gldp-"+ settings.cssName + "-btnampm", calendar).click(function() {
+		      	$(this).addClass("selected").siblings("input.gldp-"+ settings.cssName + "-btnampm").removeClass("selected");
 		      	return false;
 	        });
 				}
@@ -557,7 +550,7 @@
 					}
 
 					if (!settings.show24Hour) {
-						var ampm = time.children("input.ampm").val().toUpperCase();
+						var ampm = time.children("input.gldp-"+ settings.cssName + "-btnampm.selected").val().toUpperCase();
 						if (ampm == "PM" && hour != 12) {
 							hour += 12;
 						} else if (ampm == "AM" && hour == 12) {

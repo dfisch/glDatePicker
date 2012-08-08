@@ -101,6 +101,7 @@
 				settings.calId = self[0].id+"-gldp";
 				if(options) { settings = $.extend(settings, options); }
 				self.data("settings", settings);
+				self.data("theDate", settings.selectedDate);
 
 				// Bind click and focus event to show
 				self
@@ -119,7 +120,12 @@
 					// ex.  tomorrow, next month, next year, next friday
 					// see www.datejs.com
 					if (settings.enableText) {
-						self.bind("keyup change", function(e) {
+						self.bind("keyup", function(e) {
+							// allow the backspace without doing anything
+							if (e.keyCode == 8) {
+								return;
+							}
+
 							if(e.keyCode == 13){
 								e.stopPropagation();
 					      methods.setValue.apply(self);
@@ -226,6 +232,7 @@
 
 	    target.data("theDate", e);
       settings.selectedDate = e;
+      methods.setValue.apply(target);
 
       // Run callback to user-defined date change method
       if(settings.onChange != null && typeof settings.onChange != "undefined")
@@ -407,12 +414,11 @@
 				target.after
 				(
 					 $("<div id='"+calId+"' class='" + settings.calendarClass + "'></div>")
-					.css(
-					{
+					.css({
 						"position":settings.position,
 						"z-index":settings.zIndex,
-						"left":(target.offset().left),
-						"top":target.offset().top+target.outerHeight(true)
+						"left":settings.autoPosition ? 'auto' : (target.offset().left),
+						"top":settings.autoPosition ? 'auto' : (target.offset().top+target.outerHeight(true))
 					})
 				);
 			}

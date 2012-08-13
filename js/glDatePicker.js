@@ -122,7 +122,7 @@
 					if (settings.enableText) {
 						self.bind("keyup", function(e) {
 							// allow the backspace without doing anything
-							if (e.keyCode == 8) {
+							if (e.keyCode == 8 || e.keyCode == 37 || e.keyCode == 39) {
 								return;
 							}
 
@@ -232,7 +232,7 @@
 
 	    target.data("theDate", e);
       settings.selectedDate = e;
-      methods.setValue.apply(target);
+      //methods.setValue.apply(target);
 
       // Run callback to user-defined date change method
       if(settings.onChange != null && typeof settings.onChange != "undefined")
